@@ -134,9 +134,6 @@ var initEnv = function () {
       $("#viewer")
         .children(".page:nth-child(" + main.pdfObj.page_num + ")")
         .children(".page-container");
-        // .css({
-        //   // "z-index": "0"
-        // });
 
       evt.stopPropagation();
 
@@ -392,7 +389,9 @@ var initEnv = function () {
       if (main.drawObj.canvas.getActiveObject()) {
         switch (main.drawObj.canvas.getActiveObject().type) {
           case "path":
+            break;
           case "arrow":
+            break;
           case "ruler":
             $("#context_menu li:nth-child(0)").addClass("disabled");
             $("#context_menu li:nth-child(1)").addClass("disabled");
