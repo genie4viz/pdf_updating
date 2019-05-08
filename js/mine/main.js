@@ -531,16 +531,16 @@ var initEnv = function () {
     });
 
     $("#btn_set").on("click", function () {
-      var total_in = $("#txt_real_size").val();
-
-      if (
-        $("#popup_scale")
-        .find(":checked")
-        .val() == "ft"
-      ) {
-        total_in = $("#txt_real_size").val() * 12;
+      var feets = $("#unit_feet").val(),
+          inch = $("#unit_inch").val(),
+          fraction = $("#unit_fraction").val(), r_fraction;
+      if(fraction.split("/").length == 0 || fraction.split("/")[0] == '0'){
+        r_fraction = 0;
+      }else{
+        r_fraction = fraction.split("/")[0]/fraction.split("/")[1];
       }
 
+      var total_in = (feets * 12 + inch/1 + r_fraction);
       main.drawObj.rulerScale = total_in / main.drawObj.line_dist;
       main.drawObj.unit = "in";
       main.drawObj.drawObj._objects[1].set({
@@ -548,8 +548,9 @@ var initEnv = function () {
           main.drawObj.rulerLabel(
             main.drawObj.line_dist,
             main.drawObj.rulerScale
-          )
-      });
+          ),
+        ruler_values: main.drawObj.rulerValues(main.drawObj.line_dist, main.drawObj.rulerScale)
+      });      
       main.drawObj.canvas.renderAll();
       main.hidePopup();
     });

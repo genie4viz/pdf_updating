@@ -11,11 +11,6 @@
 	setcookie("LoggedInUserId", 2362);
 	setcookie("projectid", 1891);	
 	setcookie("scenarioid", 0);
-
-	
-
-
-
 	?>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -78,16 +73,21 @@
 			URL : <input type="text" id="txt_url" placeholder="http://www.google.com">
 			<input type="button" id="btn_insert_img" value="Insert">
 		</div>
-		<div id="popup_scale" class="popup">
-			<section>
-				<span>Real Size : </span>
-				<input type="text" id="txt_real_size">
-			</section>
-			<section>
-				<label><input type="radio" name="radio_unit" checked="" value="in">Inch</label>
-				<label><input type="radio" name="radio_unit" value="ft">Feet</label>
-				<input type="button" id="btn_set" value="Set Size">
-			</section>
+		<div id="popup_scale" class="popup">			
+			<table width="120">
+				<tr>
+					<td style="color:white"><span>Feet</span></td><td><input type="text" id="unit_feet"></td>
+				</tr>
+				<tr>
+					<td style="color:white"><span>Inch</span></td><td><input type="text" id="unit_inch"></td>
+				</tr>
+				<tr>
+					<td style="color:white"><span>Fraction</span></td><td><input type="text" id="unit_fraction"></td>
+				</tr>
+				<tr>				
+					<td colspan="2" style="text-align: center"><input type="button" id="btn_set" value="Set Size"></td>
+				</tr>
+			</table>
 		</div>
 		<div id="popup_image" class="popup">
 			<img src="#">

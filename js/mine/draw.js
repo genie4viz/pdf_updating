@@ -177,10 +177,9 @@ var classDraw = function (scale, canv_id, width, height) {
 							left: 0,
 							top: 0,
 							stroke: main.drawColor,
-							fill: false,
+							fill: false,							
 							strokeWidth: 1
-						});
-
+						});					
 					main.drawObj = new fabric.Group([path_obj],
 						{
 							type: main.shape,
@@ -296,6 +295,7 @@ var classDraw = function (scale, canv_id, width, height) {
 							angle: 0,
 							lockScalingY: true,
 							selectable: false,
+							ruler_values: {feet: 0, inch: 0, fraction: 0}
 						});
 
 					main.canvas.add(main.drawObj);
@@ -431,9 +431,15 @@ var classDraw = function (scale, canv_id, width, height) {
 
 					if (main.rulerScale) {
 						main.rulerLabel(line_dist, main.rulerScale);
-						main.drawObj._objects[1].set({ text: "Length : " + main.rulerLabel(line_dist, main.rulerScale) });
+						main.drawObj._objects[1].set({
+							text: "Length : " + main.rulerLabel(line_dist, main.rulerScale),
+							ruler_values: main.rulerValues(line_dist, main.rulerScale)
+						});
 					} else {
-						main.drawObj._objects[1].set({ text: "Length : " + main.rulerLabel(Math.round(line_dist * 100) / 100, 1) });
+						main.drawObj._objects[1].set({ 
+							text: "Length : " + main.rulerLabel(Math.round(line_dist * 100) / 100, 1),
+							ruler_values: main.rulerValues(Math.round(line_dist * 100) / 100, 1)
+						});
 					}
 					text_width = main.drawObj._objects[1].width;
 					text_left = 0 - text_width / 2;
@@ -507,16 +513,26 @@ var classDraw = function (scale, canv_id, width, height) {
 					if (main.line_dist < 0.1) {
 						main.canvas.remove(main.drawObj);
 						return;
-					}					
-					if (!main.rulerScale) {
+					}
+					// if (!main.rulerScale) {
 						canvasZoom = main.canvas.getZoom();
 						hPosX =  main.drawObj.left * canvasZoom;
 						hPosY =  main.drawObj.top * canvasZoom;
 
 						$("#popup_area").css("left", hPosX + "px");
 						$("#popup_area").css("top", hPosY + "px");
+						var measure_vals = main.drawObj._objects[1].ruler_values;
+						if(measure_vals){
+							$("#unit_feet").val(measure_vals.feet);
+							$("#unit_inch").val(measure_vals.inch);
+							$("#unit_fraction").val(measure_vals.fraction);
+						}else{
+							$("#unit_feet").val(0);
+							$("#unit_inch").val(0);
+							$("#unit_fraction").val(0);
+						}
 						main.showPopup("popup_scale");
-					}
+					// }
 					break;
 			}
 		});
@@ -530,6 +546,14 @@ var classDraw = function (scale, canv_id, width, height) {
 					top: group.top - main.cloud_sz * cloud.scaleY,				
 				});	
 			}
+		}});
+		main.canvas.on({'object:scaling': function (e) {
+			var group = e.target;
+			console.log(group)
+			// if(group.type == 'path'){
+			// 	console.log('paths')
+					
+			// }
 		}});
 		
 	}
@@ -560,7 +584,18 @@ var classDraw = function (scale, canv_id, width, height) {
 
 		return feet + " ft " + in_int + " inches " + fract[0] + "/" + fract[1] + " fraction";
 	}
-
+	main.rulerValues = function (pixel, rulerScale) {
+		var inches = Math.round(pixel * rulerScale * 100) / 100;
+		var feet = Math.floor(inches / 12);
+		var in_int = Math.floor(inches - feet * 12);
+		var in_dec = Math.round((inches - feet * 12 - in_int) * 100);
+		var fract = main.reduce(in_dec, 100);
+		return {
+			feet: feet,
+			inch: in_int,
+			fraction: fract[0] + "/" + fract[1]
+		};		
+	}
 	main.reduce = function (numerator, denominator) {
 		var gcd = function gcd(a, b) {
 			return b ? gcd(b, a % b) : a;
@@ -926,7 +961,10 @@ var classDraw = function (scale, canv_id, width, height) {
 
 	main.delete = function () {
 		var active = main.canvas.getActiveObject();
-
+		if(active.type == "rect"){
+			var cloud = main.getObjectById(active.cloud_id);
+			main.canvas.remove(cloud);	
+		}
 		if (!active)
 			return;
 
