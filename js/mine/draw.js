@@ -3,6 +3,7 @@
 //	FabricJS Object Drawing file
 //
 //***************************************************************************************//
+var drawObj = {};
 
 var classDraw = function (scale, canv_id, width, height) {
 	var main = this;
@@ -27,7 +28,7 @@ var classDraw = function (scale, canv_id, width, height) {
 	main.cloud_sz = 23;
 	main.textWidth = 150;
 	main.textHeight = 90;
-
+	main.lineWidth = 1;
 	main.arrowType = 0;
 	main.scale = scale;
 	main.rulerScale = false;
@@ -42,6 +43,7 @@ var classDraw = function (scale, canv_id, width, height) {
 		main.canvasCSS();
 		main.initFabric();
 		main.initEvent();
+		drawObj = main.canvas;
 	}
 
 	main.canvasCSS = function () {
@@ -159,6 +161,7 @@ var classDraw = function (scale, canv_id, width, height) {
 					main.canvas.add(main.cloudObj);
 					break;
 				case "arrow":
+					
 					var arrow_path = "";
 					if (main.arrowType == 1) {
 						arrow_path = "M 0 0 L 1 0 z";
@@ -178,8 +181,9 @@ var classDraw = function (scale, canv_id, width, height) {
 							top: 0,
 							stroke: main.drawColor,
 							fill: false,							
-							strokeWidth: 1
-						});					
+							strokeWidth: main.lineWidth * 1
+						});
+					
 					main.drawObj = new fabric.Group([path_obj],
 						{
 							type: main.shape,
@@ -409,7 +413,8 @@ var classDraw = function (scale, canv_id, width, height) {
 					var pointArr = main.pathToPointArr(arrow_path);
 					var left = main.drawObj.left - distance / 2;
 
-					main.drawObj._objects[0].set({ path: pointArr, left: distance / (-2) });
+					main.drawObj._objects[0].set({ path: pointArr, left: distance / (-2)});
+					// main.drawObj._objects[0].set({ path: pointArr, left: 0 });
 					main.drawObj._objects[0].setCoords();
 					main.drawObj.set({ angle: angle / Math.PI * 180, width: distance });
 					break;
@@ -547,14 +552,6 @@ var classDraw = function (scale, canv_id, width, height) {
 				});	
 			}
 		}});
-		main.canvas.on({'object:scaling': function (e) {
-			var group = e.target;
-			console.log(group)
-			// if(group.type == 'path'){
-			// 	console.log('paths')
-					
-			// }
-		}});
 		
 	}
 	main.getCloudCounts = function(){
@@ -640,6 +637,12 @@ var classDraw = function (scale, canv_id, width, height) {
 					$("#attach_file").html("File : " + obj.file);
 
 					main.showPopup("popup_attach");
+					break;
+				case "path":
+					main.lineWidth = obj.strokeWidth * 1;
+					break;
+				case "arrow":
+					main.lineWidth = obj._objects[0].strokeWidth * 1;
 					break;
 			}
 

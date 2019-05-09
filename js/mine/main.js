@@ -36,7 +36,7 @@ var initEnv = function () {
       main.initUploader();
       main.initColors();
       main.initFonts();
-      main.initSizes();
+      // main.initSizes();
       window.addEventListener("resize", main.initCSS);
     }, 3000);
   };
@@ -159,7 +159,7 @@ var initEnv = function () {
       $("#background_area").css("display", "none");
       $("#font_area").css("display", "none");
       $("#font_style").css("display", "none");
-      $("#font_size").css("display", "none");
+      $("#font_size").css("display", "none");      
 
       $(this).addClass("active");
 
@@ -175,7 +175,7 @@ var initEnv = function () {
         case 1:
           main.drawObj.canvas.isDrawingMode = true;
           main.drawObj.shape = null;
-          main.drawObj.setSelectable(false);
+          main.drawObj.setSelectable(false);          
           break;
         case 2:
           main.drawObj.canvas.isDrawingMode = false;
@@ -225,9 +225,9 @@ var initEnv = function () {
             });
           break;
         case 8:
-          $("#font_area").css("display", "block");
-          $("#font_style").css("display", "block");
-          $("#font_size").css("display", "block");
+          // $("#font_area").css("display", "block");
+          // $("#font_style").css("display", "block");
+          // $("#font_size").css("display", "block");
           $("#background_area").css("display", "block");
 
           main.drawObj.canvas.isDrawingMode = false;
@@ -235,42 +235,56 @@ var initEnv = function () {
           main.drawObj.setSelectable(false);
           break;
         case 9:
-          $("#font_area").css("display", "block");
-          $("#font_style").css("display", "block");
-          $("#font_size").css("display", "block");
+          // $("#font_area").css("display", "block");
+          // $("#font_style").css("display", "block");
+          // $("#font_size").css("display", "block");
           $("#background_area").css("display", "block");
           main.drawObj.canvas.isDrawingMode = false;
           main.drawObj.shape = "picture";
           main.drawObj.setSelectable(false);
           break;
         case 10:
-          $("#font_area").css("display", "block");
-          $("#font_style").css("display", "block");
-          $("#font_size").css("display", "block");
+          // $("#font_area").css("display", "block");
+          // $("#font_style").css("display", "block");
+          // $("#font_size").css("display", "block");
           break;
         case 11:
-          $("#background_area").css("display", "block");
+          // $("#background_area").css("display", "block");
           break;
       }
     });
 
     $(".expand").on("click", function () {
-      if (
-        $(this)
-        .children("ul")
-        .hasClass("show")
-      ) {
-        $(this)
-          .children("ul")
-          .removeClass("show");
+      if ($(this).children("ul").hasClass("show")) {
+        $(this).children("ul").removeClass("show");
       } else {
         $("#menu_area").find("ul").removeClass("show");
         $(this)
           .children("ul")
           .addClass("show");
-      }
+        $("#slider_stroke_width").val(main.drawObj.lineWidth);
+        $("#span_line_width").text(main.drawObj.lineWidth);  
+      }      
     });
-
+    //stroke width slider control
+    $("#slider_stroke_width").on('input', function(e){
+      var range_val = $(this).val() * 1;
+      $("#span_line_width").text(range_val);
+      main.drawObj.lineWidth = range_val;
+      main.drawObj.drawSize = range_val;
+      main.drawObj.canvas.freeDrawingBrush.width = range_val;
+      var selectedObj = main.drawObj.canvas.getActiveObject();
+      if(!selectedObj) return;
+      switch(selectedObj.type){
+        case 'path':
+          selectedObj.set({strokeWidth: range_val});
+          break;
+        case 'arrow':
+          selectedObj._objects[0].set({strokeWidth: range_val});
+        break;
+      }
+      main.drawObj.canvas.renderAll();
+    })
     $("#arrow_list li").on("click", function (evt) {
       var src = $(this)
         .children("img")
@@ -880,30 +894,7 @@ var initEnv = function () {
     $("#popup_area")
       .find(".active")
       .removeClass("active");
-  };
-
-  main.initSizes = function () {
-    var length = $("#size_list").children("li").length * 50;
-
-    $("#size_list").css("width", length + "px");
-    $("#size_list")
-      .find(".border_line")
-      .each(function () {
-        var size = $(this)
-          .parent()
-          .attr("mode");
-
-        $(this).css("height", size + "px");
-        $(this).css("margin-top", 19 - size + "px");
-      });
-
-    $("#size_list")
-      .children("li")
-      .on("click", function () {
-        main.drawObj.drawSize = $(this).attr("mode");
-        main.drawObj.canvas.freeDrawingBrush.width = main.drawObj.drawSize;
-      });
-  };
+  }; 
 
   main.initFonts = function () {
     var font_arr = ["Arial Black", "Cursive", "Sans-serif"];

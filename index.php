@@ -50,7 +50,7 @@
 		</ul>
 	</div>
 	<div id="viewer"></div>
-	<div id="popup_area">
+	<div id="popup_area">		
 		<div id="popup_text" class="popup">
 			<textarea></textarea>
 		</div>
@@ -108,31 +108,9 @@
 				<img src="img/icon_hand.png">
 				<p tool="select">Select</p>
 			</dd>
-			<dd class="expand">
+			<dd>
 				<img src="img/icon_pen.png">
-				<p tool="draw">Draw</p>
-				<ul id="size_list">
-					<li mode="1">
-						<div class="border_line"></div>
-						<p>1px</p>
-					</li>
-					<li mode="2">
-						<div class="border_line"></div>
-						<p>2px</p>
-					</li>
-					<li mode="3">
-						<div class="border_line"></div>
-						<p>3px</p>
-					</li>
-					<li mode="4">
-						<div class="border_line"></div>
-						<p>4px</p>
-					</li>
-					<li mode="5">
-						<div class="border_line"></div>
-						<p>5px</p>
-					</li>
-				</ul>
+				<p tool="draw">Draw</p>				
 			</dd>
 			<dd>
 				<img src="img/icon_box.png">
@@ -176,54 +154,64 @@
         <img src="img/icon_attach.png">
         <p tool="highlight">Attach</p>
       </dd>	
-			<dd>
-				<img src="img/icon_picture.png">
-				<p tool="image">Image</p>
-			</dd>
-			<dd class="expand">
-				<h3 id="color_area"></h3>
-				<p>Stroke</p>
-			</dd>
-			<dd class="expand" id="background_area">
-				<h3 id="color_background"></h3>
-				<p>Background</p>
-			</dd>
-			<dd id="font_area" class="expand">
-				<h5>Arial</h5>
-				<ul>
-					<li>Arial</li>
-					<li>Cursive</li>
-					<li>Sans-serif</li>
-				</ul>
-			</dd>
-			<dd id="font_style" class="expand">
-				<h5>Normal</h5>
-				<ul>
-					<li>Normal</li>
-					<li>Bold</li>
-					<li>Italic</li>
-				</ul>
-			</dd>
-			<dd id="font_size" class="expand">
-				<h5>15</h5>
-				<ul>
-					<li>8</li>
-					<li>9</li>
-					<li>10</li>
-					<li>11</li>
-					<li>12</li>
-					<li>13</li>
-					<li>14</li>
-					<li>15</li>
-					<li>16</li>
-					<li>17</li>
-					<li>18</li>
-					<li>19</li>
-					<li>20</li>
-					<li>25</li>
-					<li>30</li>
-				</ul>
-			</dd>
+		<dd>
+			<img src="img/icon_picture.png">
+			<p tool="image">Image</p>
+		</dd>
+		<dd class="expand" id="line_width">
+			<img src="img/icon_linestroke.png">
+			<p>LineWidth</p>
+			<ul>
+				<div id="slider_pane">
+					<input type="range" value="1" min="1" max="10" step="1" id="slider_stroke_width">
+					<span id="span_line_width">1</span>px
+				</div>
+			</ul>			
+		</dd>
+		<dd class="expand">
+			<h3 id="color_area"></h3>
+			<p>Stroke</p>
+		</dd>
+		<dd class="expand" id="background_area">
+			<h3 id="color_background"></h3>
+			<p>Background</p>
+		</dd>		
+		<dd id="font_area" class="expand">
+			<h5>Arial</h5>
+			<ul>
+				<li>Arial</li>
+				<li>Cursive</li>
+				<li>Sans-serif</li>
+			</ul>
+		</dd>
+		<dd id="font_style" class="expand">
+			<h5>Normal</h5>
+			<ul>
+				<li>Normal</li>
+				<li>Bold</li>
+				<li>Italic</li>
+			</ul>
+		</dd>
+		<dd id="font_size" class="expand">
+			<h5>15</h5>
+			<ul>
+				<li>8</li>
+				<li>9</li>
+				<li>10</li>
+				<li>11</li>
+				<li>12</li>
+				<li>13</li>
+				<li>14</li>
+				<li>15</li>
+				<li>16</li>
+				<li>17</li>
+				<li>18</li>
+				<li>19</li>
+				<li>20</li>
+				<li>25</li>
+				<li>30</li>
+			</ul>
+		</dd>
 		</dl>
 	</div>
 	<div id="menu_other">
