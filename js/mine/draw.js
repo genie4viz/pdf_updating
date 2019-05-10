@@ -362,6 +362,7 @@ var classDraw = function (scale, canv_id, width, height) {
 					$("#popup_attach object").removeAttr("data");
 					$("#popup_attach a").attr("href", "#");
 					$("#popup_attach a").html("");
+					
 					main.showPopup("popup_attach");
 					break;
 			}
@@ -431,16 +432,13 @@ var classDraw = function (scale, canv_id, width, height) {
 
 					main.drawObj._objects[0].set({ path: pointArr, left: line_dist / (-2) });
 					main.drawObj._objects[0].setCoords();
-
-
-
+					
 					if (main.rulerScale) {
-						main.rulerLabel(line_dist, main.rulerScale);
 						main.drawObj._objects[1].set({
 							text: "Length : " + main.rulerLabel(line_dist, main.rulerScale),
 							ruler_values: main.rulerValues(line_dist, main.rulerScale)
 						});
-					} else {
+					} else {						
 						main.drawObj._objects[1].set({ 
 							text: "Length : " + main.rulerLabel(Math.round(line_dist * 100) / 100, 1),
 							ruler_values: main.rulerValues(Math.round(line_dist * 100) / 100, 1)
@@ -578,8 +576,11 @@ var classDraw = function (scale, canv_id, width, height) {
 		var in_int = Math.floor(inches - feet * 12);
 		var in_dec = Math.round((inches - feet * 12 - in_int) * 100);
 		var fract = main.reduce(in_dec, 100);
-
-		return feet + " ft " + in_int + " inches " + fract[0] + "/" + fract[1] + " fraction";
+		var str_fract = '';
+		if(fract[0] != '0'){
+			str_fract = fract[0] + "/" + fract[1] + " fraction";
+		}
+		return feet + " ft " + in_int + " inches " + str_fract;
 	}
 	main.rulerValues = function (pixel, rulerScale) {
 		var inches = Math.round(pixel * rulerScale * 100) / 100;
@@ -635,7 +636,8 @@ var classDraw = function (scale, canv_id, width, height) {
 					$("#popup_attach object").attr('data', obj.src);
 					$("#attach_file").attr("href", obj.src);
 					$("#attach_file").html("File : " + obj.file);
-
+					console.log(obj.src);
+					console.log(obj.file);
 					main.showPopup("popup_attach");
 					break;
 				case "path":
@@ -860,7 +862,7 @@ var classDraw = function (scale, canv_id, width, height) {
 	}
 	main.copy = function (obj = null, selectedText = '') {
 		var active = main.canvas.getActiveObject();
-		
+		console.log(active, 'ccc')
 		if(active == null){//comment partial copy
 			active = obj;
 		}
@@ -871,7 +873,7 @@ var classDraw = function (scale, canv_id, width, height) {
 	main.paste = function (x, y) {
 		if (!main.clipboard)
 			return;
-
+		console.log(main.clipboard, 'pastable')
 		switch (main.clipboard.type) {
 			case "rect":
 				var bg = fabric.util.object.clone(main.clipboard._objects[0]);
@@ -926,7 +928,7 @@ var classDraw = function (scale, canv_id, width, height) {
 					txt.text = main.clipboard._objects[1].clone_text;
 				txt.left = x + 5;
 				txt.top = y + 5;
-				main.canvas.sendToBack(bg);
+				// main.canvas.sendToBack(bg);
 				main.canvas.bringToFront(txt);
 				var copied = new fabric.Group([bg, txt],
 					{

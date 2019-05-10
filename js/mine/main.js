@@ -255,8 +255,10 @@ var initEnv = function () {
     });
 
     $(".expand").on("click", function () {
+      console.log('aaa')
       if ($(this).children("ul").hasClass("show")) {
         $(this).children("ul").removeClass("show");
+        console.log('bbb')
       } else {
         $("#menu_area").find("ul").removeClass("show");
         $(this)
@@ -499,11 +501,10 @@ var initEnv = function () {
           main.drawObj.canvas.deactivateAll();
           main.drawObj.canvas.renderAll();
           break;
-        case 1:
-          if(main.prevTool != null){//comment text copy
+        case 1:          
+          if(main.prevTool != null){//comment text copy            
             var txt_start = $('#popup_text textarea')[0].selectionStart;
-            var txt_end = $('#popup_text textarea')[0].selectionEnd
-            
+            var txt_end = $('#popup_text textarea')[0].selectionEnd            
             var selectedText = $('#popup_text textarea')[0].value.substring(txt_start, txt_end);            
             // main.prevTool.prevText = main.prevTool._objects[1].text;
             main.prevTool._objects[1].clone_text = selectedText;
@@ -767,11 +768,13 @@ var initEnv = function () {
       responseType: "json",
 
       onComplete: function (filename, response) {
+        $("#btn_attach_upload").css("display","none");
         $("#popup_attach object").attr("data", "tmp/" + filename);
-
+        $("#popup_attach object").css("display", "none");
+        $("#popup_attach object").css("display", "flex");
         $("#attach_file").attr("href", "tmp/" + filename);
         $("#attach_file").html("File : " + filename);
-
+        
         main.drawObj.drawObj.src = "tmp/" + filename;
         main.drawObj.drawObj.file = filename;
         // $("#popup_image img").attr("src", "tmp/" + filename);

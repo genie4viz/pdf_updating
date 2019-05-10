@@ -1,0 +1,65 @@
+﻿1. After you choose your graph and hit next, a modal should pop up (look at ModalWrapper). 
+2. You will need to define the inputs on the right hand side, it is specific for each graph, but the implementation should be scalable. Again, put the input schema with the constant file you created before
+3. You can skip the "core, table, view" input. 
+4. The rest of the inputs you can fill with fake data. Please put all fake data in one constant file. 
+5. You can fill the graph with fake data as well.
+
+https://projects.invisionapp.com/share/NRR1R3GG2KQ#/screens/357168433
+
+
+Example of fake data & options. 
+Bar Graph
+1. Table -> Dropdown list of tables
+2. X-axis:
+2a. Pick a field... -> Dropdown list of table fields. ex. Revenue, Profit
+2b. Switch field -> Include empty cells?
+2c. Switch field -> Show axis label
+3. Y-axis:
+3a. Pick a field... -> Dropdown list of table fields. ex. Revenue, Profit
+3b. Switch field -> Aggregate -> then dropdown for sum, min, max, mean
+3c. Switch field -> Show axis label
+
+Here is the data structure that will appear
+const tableData = {
+id: 'tbl123124214',
+name: 'Table1',
+tableData: {
+rows: [
+{
+id: 'rowoasdhfuoas',
+cells: [
+{
+columnId: 'col1oiu2hu12j',
+id: 'col1oiu2hu12j:rowoasdhfuoas',
+value: { type: 'NUMBER', number: '24241' },
+},
+],
+},
+{
+id: 'row1iu241u24hu',
+cells: [
+{
+columnId: 'col12oiu4h12ou4h',
+id: 'col12oiu4h12ou4h:row1iu241u24hu',
+value: { type: 'NUMBER', number: '28492' },
+},
+],
+},
+],
+},
+viewDatas: [
+{
+id: 'viwiuhwoefhowiehfoiwef',
+name: 'Grid View',
+type: 'GRID',
+columns: [
+{ id: 'col1oiu2hu12j', type: 'NUMBER', name: 'Revenue' },
+{ id: 'col12oiu4h12ou4h', type: 'NUMBER', name: 'Profit' },
+],
+},
+],
+};
+
+Please follow airtables implementation here
+https://airtable.com/tblhdtK45wTmbldv4/viwclpPPQnYclj5gb?blocks=bliIM4SeUT0R8DMrR
+이거

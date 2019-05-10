@@ -73,6 +73,7 @@ body
 
 #menu_area dd
 {
+	position: relative;
 	cursor: pointer;
     width: 50px;
     height: 50px;
@@ -293,7 +294,7 @@ body
     position: absolute;
     margin-top: -50px;
     width: 135px;
-    left: 0px;
+	left: 0px;
 }
 
 #font_area li
@@ -394,6 +395,7 @@ body
 	margin-top: -46px;
 	background-color: #1e1e20;
 	display: none;
+	z-index: 5;
 }
 
 .expand ul li

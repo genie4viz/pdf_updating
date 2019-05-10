@@ -216,7 +216,9 @@
 				if (cal.data('colorpicker').onShow.apply(this, [cal.get(0)]) != false) {
 					cal.show();
 				}
-				$(document).bind('mousedown', {cal: cal}, hide);
+				var target = $(ev.target.closest("dd"));
+				target.unbind("click");
+				$(document).bind('click', {cal: cal, target:target}, hide);
 				return false;
 			},
 			hide = function (ev) {
@@ -224,8 +226,10 @@
 					if (ev.data.cal.data('colorpicker').onHide.apply(this, [ev.data.cal.get(0)]) != false) {
 						ev.data.cal.hide();
 					}
-					$(document).unbind('mousedown', hide);
+					$(document).unbind('click', hide);
+					ev.data.target.bind("click", show);
 				}
+				return false;
 			},
 			isChildOf = function(parentEl, el, container) {
 				if (parentEl == el) {
