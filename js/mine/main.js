@@ -768,22 +768,18 @@ var initEnv = function () {
       responseType: "json",
 
       onComplete: function (filename, response) {
-        $("#btn_attach_upload").css("display","none");
         $("#popup_attach object").attr("data", "tmp/" + filename);
         $("#popup_attach object").css("display", "none");
-        $("#popup_attach object").css("display", "flex");
+        $("#popup_attach object").css("display", "block");
         $("#attach_file").attr("href", "tmp/" + filename);
         $("#attach_file").html("File : " + filename);
-        
+        $("#btn_attach_upload").css("display", "none");
         main.drawObj.drawObj.src = "tmp/" + filename;
         main.drawObj.drawObj.file = filename;
-        // $("#popup_image img").attr("src", "tmp/" + filename);
-
-        // main.hidePopup();
-        // main.showPopup("popup_image");
+        
       },
-      onError: function () {
-        console.log("error");
+      onError: function (err) {
+        console.log("error", err);
       }
     });
   };

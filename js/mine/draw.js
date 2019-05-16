@@ -33,8 +33,7 @@ var classDraw = function (scale, canv_id, width, height) {
 	main.scale = scale;
 	main.rulerScale = false;
 	main.unit = "";
-	main.parent = null;
-
+	main.parent = null;	
 	main.fontSize = 15;
 	main.fontFamily = "Arial Black";
 	main.fontStyle = "Normal";
@@ -69,9 +68,71 @@ var classDraw = function (scale, canv_id, width, height) {
 	}
 
 	main.initEvent = function () {
-		// $('textarea').bind('aserae,pasdf', 'select'){
-
-		// }
+		$("#popup_text textarea").on('keyup', function(){
+			var resz_height = this.scrollHeight + parseFloat($(this).css("borderTopWidth")) + parseFloat($(this).css("borderBottomWidth"))
+			$(this).height(resz_height)
+			
+			switch(main.drawObj.type){
+				case 'rect':
+					var cloud = main.getObjectById(main.drawObj.cloud_id);
+					var rate_height = resz_height/90;//90 is default unit for cloud					
+					
+					cloud.set({
+						top: main.drawObj.top - main.cloud_sz * rate_height,
+						scaleY: rate_height
+					});
+					main.drawObj._objects[0].set({
+						height: resz_height
+					})
+				break;
+				case 'text':
+					main.drawObj._objects[0].set({
+						height: resz_height
+					})
+				break;
+				case 'comment':
+					main.drawObj._objects[0].set({
+						height: resz_height
+					})
+				break;
+			}
+			main.canvas.renderAll();
+		})
+		
+		$('#popup_text textarea').bind('mouseup mousemove',function(){
+			// if(!main.textarea_draging) return;
+			var resz_width = this.scrollWidth + parseFloat($(this).css("borderTopWidth")) + parseFloat($(this).css("borderBottomWidth"))
+			var resz_height = this.scrollHeight + parseFloat($(this).css("borderTopWidth")) + parseFloat($(this).css("borderBottomWidth"))
+			
+			switch(main.drawObj.type){
+				case 'rect':
+					var cloud = main.getObjectById(main.drawObj.cloud_id);
+					var rate_height = resz_height/90;//90 is default unit for cloud
+					var rate_width = resz_width/150;//90 is default unit for cloud
+					cloud.set({
+						left: main.drawObj.left - main.cloud_sz * rate_width,
+						top: main.drawObj.top - main.cloud_sz * rate_height,
+						scaleX: rate_width,
+						scaleY: rate_height
+					});					
+				break;
+				case 'text':
+					main.drawObj._objects[0].set({
+						width: resz_width,
+						height: resz_height
+					})
+				break;
+				case 'comment':
+					main.drawObj._objects[0].set({
+						width: resz_width,
+						height: resz_height
+					})
+				break;
+			}
+			main.canvas.renderAll();
+			main.textarea_draging = false;
+		});		
+		
 		main.canvas.on("mouse:down", function (evt) {
 
 			$("#menu_area").find("ul").removeClass("show");
@@ -356,6 +417,7 @@ var classDraw = function (scale, canv_id, width, height) {
 					hPosX = main.drawObj.left * canvasZoom;
 					hPosY = main.drawObj.top * canvasZoom;
 
+					$("#btn_attach_upload").css("display", "block");
 					$("#popup_area").css("left", hPosX + "px");
 					$("#popup_area").css("top", hPosY + "px");
 
@@ -576,11 +638,15 @@ var classDraw = function (scale, canv_id, width, height) {
 		var in_int = Math.floor(inches - feet * 12);
 		var in_dec = Math.round((inches - feet * 12 - in_int) * 100);
 		var fract = main.reduce(in_dec, 100);
+		var str_inch = '';
+		if (in_int != 0){
+			str_inch = in_int + " inches ";
+		}
 		var str_fract = '';
 		if(fract[0] != '0'){
 			str_fract = fract[0] + "/" + fract[1] + " fraction";
 		}
-		return feet + " ft " + in_int + " inches " + str_fract;
+		return feet + " ft " + str_inch + str_fract;
 	}
 	main.rulerValues = function (pixel, rulerScale) {
 		var inches = Math.round(pixel * rulerScale * 100) / 100;
@@ -630,14 +696,22 @@ var classDraw = function (scale, canv_id, width, height) {
 					break;
 				
 				case "attach":
+					$("#btn_attach_upload").css("display", "block");
 					$("#popup_area").css("left", left + "px");
 					$("#popup_area").css("top", top + "px");
 
-					$("#popup_attach object").attr('data', obj.src);
-					$("#attach_file").attr("href", obj.src);
-					$("#attach_file").html("File : " + obj.file);
-					console.log(obj.src);
-					console.log(obj.file);
+					if(obj.src){
+						$("#btn_attach_upload").css("display", "none");
+						$("#popup_attach object").attr('data', obj.src);
+						$("#attach_file").attr("href", obj.src);
+						$("#attach_file").html("File : " + obj.file);
+					}else{
+						$("#btn_attach_upload").css("display", "block");
+						$("#popup_attach object").removeAttr("data");
+					    $("#attach_file").attr("href", '');
+					    $("#attach_file").html("");
+					}
+					
 					main.showPopup("popup_attach");
 					break;
 				case "path":
@@ -861,8 +935,7 @@ var classDraw = function (scale, canv_id, width, height) {
 		return object;
 	}
 	main.copy = function (obj = null, selectedText = '') {
-		var active = main.canvas.getActiveObject();
-		console.log(active, 'ccc')
+		var active = main.canvas.getActiveObject();		
 		if(active == null){//comment partial copy
 			active = obj;
 		}
