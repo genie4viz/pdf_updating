@@ -113,7 +113,7 @@
 				<p tool="draw">Draw</p>				
 			</dd>
 			<dd>
-				<img src="img/icon_box.png">
+				<img src="img/cloud.png">
 				<p tool="box">Cloud</p>
 			</dd>
 			<dd class="expand">
