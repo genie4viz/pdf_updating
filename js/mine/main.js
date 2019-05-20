@@ -16,7 +16,8 @@ var initEnv = function () {
   main.pdfObj = null;
   main.is_draw = 0;
   main.selTool = 0;  
-  main.highlighted_cls = null;
+  main.highlighted_cur = null;
+  main.highlighted_arr = [];
   main.scale = 1;
   main.drawColor = "#ff0000"; // only for init / match with draw.js
   main.backColor = "#00ff00"; // only for init / match with draw.js
@@ -406,7 +407,7 @@ var initEnv = function () {
       }      
 
       $("#context_menu li:nth-child(1)").removeClass("disabled");
-      if(main.highlighted_cls){        
+      if(main.highlighted_cur){        
         $("#context_menu li:nth-child(4)").addClass("enabled");
       }
       if (main.drawObj.canvas.getActiveObject()) {
@@ -535,17 +536,14 @@ var initEnv = function () {
           main.drawObj.paste(xPos / zoom, yPos / zoom);
           break;
         case 3:
-          if(main.highlighted_cls){
-            var cls = main.highlighted_cls.split(' ')[0];
-            $('.' + cls).each(function(index){
-              if($(this).attr('class').includes('highlighted')){
-                $(this).css('background-color', 'rgba(255,0,0,0)');
-                var parent_text = $(this).parent().text();
-                $(this).parent().text(parent_text);
-                $(this).remove();
-              }
+          if(main.highlighted_cur){           
+            $('.' + main.highlighted_cur).each(function(index){
+              var parent_text = $(this).parent().text();
+              $(this).parent().text(parent_text);
+              $(this).remove();
             });
-            main.highlighted_cls = false;
+            main.highlighted_arr = main.highlighted_arr.filter(e => e != main.highlighted_cur);
+            main.highlighted_cur = false;
           }else{
             main.drawObj.delete();
           }
@@ -563,11 +561,17 @@ var initEnv = function () {
       
       if(main.drawObj.shape == "select"){
         var sel_class = evt.target.className.split(' ')[0];
-        if(sel_class){          
-          main.highlighted_cls = sel_class;          
+        if(sel_class.includes('hl_')){
+          for(var i = 0; i < main.highlighted_arr.length; i++){
+            $('.' + main.highlighted_arr[i]).each(function(index){
+              $(this).attr('class', main.highlighted_arr[i] + ' highlighted');
+            });  
+          }
+          console.log(sel_class, 'selected ss')
+          main.highlighted_cur = sel_class;          
           $('.' + sel_class).each(function(index){
-            $(this).css('background-color', 'rgba(255,0,0,0.5)');
-          });          
+            $(this).attr('class', sel_class + ' selected');
+          });
         }
       }else if(main.drawObj.shape == "highlight"){        
         main.highlight();
@@ -685,6 +689,13 @@ var initEnv = function () {
   main.getRandomInt = function(max) {
     return Math.floor(Math.random() * Math.floor(max));
   }
+  main.removeDuplicated = function(arr) {    
+    var uniqueNames = [];
+    $.each(arr, function(i, el){
+        if($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
+    });
+    return uniqueNames;
+  }
   main.highlight = function () {
     // console.clear();
     
@@ -715,8 +726,9 @@ var initEnv = function () {
     $('.highlight').each(function(index){
       $(this).attr('class', curClass + " highlighted");
     });
-    main.highlighted_cls = curClass;
-    
+    main.highlighted_cur = curClass;
+    main.highlighted_arr.push(curClass);
+    main.highlighted_arr = main.removeDuplicated(main.highlighted_arr);
   };
 
   main.highlightText = function (elem, offsetType, idx) {      
