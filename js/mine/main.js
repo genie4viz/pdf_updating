@@ -15,7 +15,8 @@ var initEnv = function () {
   main.drawObj = null;
   main.pdfObj = null;
   main.is_draw = 0;
-  main.selTool = 0;
+  main.selTool = 0;  
+  main.highlighted_cls = null;
   main.scale = 1;
   main.drawColor = "#ff0000"; // only for init / match with draw.js
   main.backColor = "#00ff00"; // only for init / match with draw.js
@@ -27,7 +28,7 @@ var initEnv = function () {
     //main.getJsonMeta(companyid, projectid, scenarioid, "gs.pdf");
     //main.getUserInfo(companyid);
     //main.getComments(989);
-    main.downloadPDF();
+  //  main.downloadPDF();
     //------------------------------------------------------------------------//
 
     setTimeout(() => {
@@ -136,7 +137,7 @@ var initEnv = function () {
         .children(".page-container");
 
       evt.stopPropagation();
-
+      
       if (!$(this).hasClass("expand")) $(".show").removeClass("show");
 
       if (!main.drawObj) return;
@@ -160,7 +161,12 @@ var initEnv = function () {
       $("#font_area").css("display", "none");
       $("#font_style").css("display", "none");
       $("#font_size").css("display", "none");      
-
+      // $("#viewer")
+      //   .children(".page:nth-child(" + main.pdfObj.page_num + ")")
+      //   .children(".page-container")
+      //   .css({
+      //     "z-index": "8"
+      //   });
       $(this).addClass("active");
 
       switch ($(this).index()) {
@@ -222,7 +228,7 @@ var initEnv = function () {
             .children(".page-container")
             .css({
               "z-index": "999"
-            });
+            });            
           break;
         case 8:
           // $("#font_area").css("display", "block");
@@ -253,12 +259,11 @@ var initEnv = function () {
           break;
       }
     });
+    
 
-    $(".expand").on("click", function () {
-      console.log('aaa')
+    $(".expand").on("click", function () {      
       if ($(this).children("ul").hasClass("show")) {
-        $(this).children("ul").removeClass("show");
-        console.log('bbb')
+        $(this).children("ul").removeClass("show");        
       } else {
         $("#menu_area").find("ul").removeClass("show");
         $(this)
@@ -386,22 +391,24 @@ var initEnv = function () {
       $("#context_menu").css("display", "none");
       $("#context_menu").fadeIn();
 
-      $("#context_menu").removeClass("disabled");
-
+      $("#context_menu").removeClass("disabled");      
       if (!main.drawObj.canvas.getActiveObject()) {        
-        if(main.prevTool == null)
+        if(main.prevTool == null ){
           $("#context_menu").addClass("disabled");
-      }
-
+        }
+      }      
       if (main.drawObj.clipboard) {
         $("#context_menu li:nth-child(3)").addClass("enabled");
         $("#context_menu li:nth-child(3)").removeClass("disabled");
       } else {
         $("#context_menu li:nth-child(3)").removeClass("enabled");
         $("#context_menu li:nth-child(3)").addClass("disabled");
-      }
+      }      
 
       $("#context_menu li:nth-child(1)").removeClass("disabled");
+      if(main.highlighted_cls){        
+        $("#context_menu li:nth-child(4)").addClass("enabled");
+      }
       if (main.drawObj.canvas.getActiveObject()) {
         switch (main.drawObj.canvas.getActiveObject().type) {
           case "path":
@@ -411,9 +418,8 @@ var initEnv = function () {
           case "ruler":
             $("#context_menu li:nth-child(0)").addClass("disabled");
             $("#context_menu li:nth-child(1)").addClass("disabled");
-            $("#context_menu li:nth-child(2)").addClass("disabled");            
+            $("#context_menu li:nth-child(2)").addClass("disabled");
             break;
-          
         }
       }
 
@@ -529,7 +535,21 @@ var initEnv = function () {
           main.drawObj.paste(xPos / zoom, yPos / zoom);
           break;
         case 3:
-          main.drawObj.delete();
+          if(main.highlighted_cls){
+            var cls = main.highlighted_cls.split(' ')[0];
+            $('.' + cls).each(function(index){
+              if($(this).attr('class').includes('highlighted')){
+                $(this).css('background-color', 'rgba(255,0,0,0)');
+                var parent_text = $(this).parent().text();
+                $(this).parent().text(parent_text);
+                $(this).remove();
+              }
+            });
+            main.highlighted_cls = false;
+          }else{
+            main.drawObj.delete();
+          }
+          
           main.hidePopup();
           break;
         case 4:
@@ -540,34 +560,50 @@ var initEnv = function () {
     });
 
     $("#viewer").on("mouseup", ".page-container", function (evt) {
-      main.highlight();
-      main.clearSelection();
-      evt.preventDefault();
+      
+      if(main.drawObj.shape == "select"){
+        var sel_class = evt.target.className.split(' ')[0];
+        if(sel_class){          
+          main.highlighted_cls = sel_class;          
+          $('.' + sel_class).each(function(index){
+            $(this).css('background-color', 'rgba(255,0,0,0.5)');
+          });          
+        }
+      }else if(main.drawObj.shape == "highlight"){        
+        main.highlight();
+        main.clearSelection();
+        evt.preventDefault();
+      }
     });
-
+    
     $("#btn_set").on("click", function () {
       var feets = $("#unit_feet").val(),
           inch = $("#unit_inch").val(),
           fraction = $("#unit_fraction").val(), r_fraction;
-      if(fraction.split("/").length == 0 || fraction.split("/")[0] == '0'){
-        r_fraction = 0;
+      if(!feets && !inch && !fraction){
+        alert('Set one of these values.')
       }else{
-        r_fraction = fraction.split("/")[0]/fraction.split("/")[1];
+        if(!fraction || fraction.split("/").length == 0 || fraction.split("/")[0] == '0'){
+          r_fraction = 0;
+        }else{
+          r_fraction = fraction.split("/")[0]/fraction.split("/")[1];
+        }
+        if(!inch) inch = 0;
+        if(!feets) feets = 0;
+        var total_in = (feets * 12 + inch/1 + r_fraction);
+        main.drawObj.rulerScale = total_in / main.drawObj.line_dist;
+        main.drawObj.unit = "in";
+        main.drawObj.drawObj._objects[1].set({
+          text: "Length : " +
+            main.drawObj.rulerLabel(
+              main.drawObj.line_dist,
+              main.drawObj.rulerScale
+            ),
+          ruler_values: main.drawObj.rulerValues(main.drawObj.line_dist, main.drawObj.rulerScale)
+        });      
+        main.drawObj.canvas.renderAll();
+        main.hidePopup();
       }
-
-      var total_in = (feets * 12 + inch/1 + r_fraction);
-      main.drawObj.rulerScale = total_in / main.drawObj.line_dist;
-      main.drawObj.unit = "in";
-      main.drawObj.drawObj._objects[1].set({
-        text: "Length : " +
-          main.drawObj.rulerLabel(
-            main.drawObj.line_dist,
-            main.drawObj.rulerScale
-          ),
-        ruler_values: main.drawObj.rulerValues(main.drawObj.line_dist, main.drawObj.rulerScale)
-      });      
-      main.drawObj.canvas.renderAll();
-      main.hidePopup();
     });
 
     $("#tool_area dd").on("click", function () {
@@ -646,30 +682,46 @@ var initEnv = function () {
       $("#popup_text textarea").css("height", hHeight + "px");
     }
   };
-
+  main.getRandomInt = function(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
   main.highlight = function () {
     // console.clear();
+    
     var range = window.getSelection().getRangeAt(0),
       parent = range.commonAncestorContainer,
       start = range.startContainer,
       end = range.endContainer;
-    var startDOM =
-      start.parentElement == parent ? start.nextSibling : start.parentElement;
+
+    var curClass = 'hl_' + main.getRandomInt(10000);
+    var startDOM = start.parentElement == parent ? start.nextSibling : start.parentElement;    
+    // startDOM.setAttribute('class', curClass);
+    console.log(startDOM, 'startDOM')
     var currentDOM = startDOM.nextElementSibling;
     var endDOM = end.parentElement == parent ? end : end.parentElement;
+    // endDOM.setAttribute('class', curClass);
+    console.log(endDOM, 'endDOM')
     //Process Start Element
     main.highlightText(startDOM, "START", range.startOffset);
-    while (currentDOM != endDOM && currentDOM != null) {
+    console.log(currentDOM, 'currentDOM before')
+    while (currentDOM != endDOM && currentDOM != null) {      
+      // currentDOM.setAttribute('class', curClass);
       main.highlightText(currentDOM);
-      currentDOM = currentDOM.nextElementSibling;
+      console.log(currentDOM, 'currentDOM')
+      currentDOM = currentDOM.nextElementSibling;      
     }
-    //Process End Element
-    main.highlightText(endDOM, "END", range.endOffset);
+    //Process End Element    
+    main.highlightText(endDOM, "END", range.endOffset);    
+    $('.highlight').each(function(index){
+      $(this).attr('class', curClass + " highlighted");
+    });
+    main.highlighted_cls = curClass;
+    
   };
 
-  main.highlightText = function (elem, offsetType, idx) {
+  main.highlightText = function (elem, offsetType, idx) {      
     if (elem.nodeType == 3) {
-      var span = document.createElement("span");
+      var span = document.createElement("span");      
       span.setAttribute("class", "highlight");
       var origText = elem.textContent,
         text,
@@ -689,11 +741,11 @@ var initEnv = function () {
       var parent = elem.parentElement;
       parent.replaceChild(span, elem);
       if (prevText) {
-        var prevDOM = document.createTextNode(prevText);
+        var prevDOM = document.createTextNode(prevText);        
         parent.insertBefore(prevDOM, span);
       }
       if (nextText) {
-        var nextDOM = document.createTextNode(nextText);
+        var nextDOM = document.createTextNode(nextText);        
         //parent.appendChild(nextDOM);
         parent.insertBefore(nextDOM, span.nextSibling);
         //parent.insertBefore(span, nextDOM);

@@ -145,8 +145,9 @@ var classDraw = function (scale, canv_id, width, height) {
 			main.canvas.freeDrawingBrush.color = main.drawColor;
 			evt.e.stopPropagation();
 
-			if (evt.target)
+			if (!main.shape && evt.target){				
 				main.onObjectSelected();
+			}
 
 			if (main.is_select) {
 				main.is_select = 0;
@@ -164,6 +165,7 @@ var classDraw = function (scale, canv_id, width, height) {
 
 			switch (main.shape) {
 				case "rect":
+					console.log('rectd')
 					bg = new fabric.Rect(
 						{
 							type: "bg_stroke",
@@ -517,8 +519,8 @@ var classDraw = function (scale, canv_id, width, height) {
 			main.drawObj.setCoords();
 			main.canvas.renderAll();
 		});
-
-		main.canvas.on("mouse:up", function (evt) {
+		
+		main.canvas.on("mouse:up", function (evt) {			
 			main.isDrawing = 0;
 
 			evt.e.stopPropagation();
@@ -579,7 +581,7 @@ var classDraw = function (scale, canv_id, width, height) {
 						main.canvas.remove(main.drawObj);
 						return;
 					}
-					// if (!main.rulerScale) {
+					if (!main.rulerScale) {
 						canvasZoom = main.canvas.getZoom();
 						hPosX =  main.drawObj.left * canvasZoom;
 						hPosY =  main.drawObj.top * canvasZoom;
@@ -597,7 +599,7 @@ var classDraw = function (scale, canv_id, width, height) {
 							$("#unit_fraction").val(0);
 						}
 						main.showPopup("popup_scale");
-					// }
+					}
 					break;
 			}
 		});

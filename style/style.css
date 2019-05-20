@@ -462,7 +462,7 @@ body
 	position: absolute;
 }
 
-.highlight
+.highlight, .highlighted
 {
 	background: rgba(255, 255, 0, 0.55);
 }
