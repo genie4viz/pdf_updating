@@ -133,18 +133,9 @@ var classDraw = function (scale, canv_id, width, height) {
 			main.canvas.renderAll();
 			main.textarea_draging = false;
 		});
-		main.convertHex = function(hex, opacity){
-			hex = hex.replace('#','');
-			r = parseInt(hex.substring(0,2), 16);
-			g = parseInt(hex.substring(2,4), 16);
-			b = parseInt(hex.substring(4,6), 16);
-			result = 'rgba('+r+','+g+','+b+','+opacity/100+')';
-			console.log(result, 'colored')
-			return result;
-		}
+		
 		main.getClassNameInCursor = function (arr, c_x, c_y){
-			var str_class = null;
-			console.log(arr, 'arrs')
+			var str_class = null;			
 			for(var i = 0; i < arr.length; i++){
 				$('.' + arr[i]).each(function(index){
 					var pos = $(this).offset(),
@@ -154,12 +145,15 @@ var classDraw = function (scale, canv_id, width, height) {
 							str_class = arr[i];							
 						}
 					$(this).attr('class', arr[i] + ' highlighted');
-					$(this).css('background-color', main.convertHex(main.drawColor, 50));
+					$(this).css('background-color', main.drawColor);
+					$(this).css({opacity: 0.55});
 				});
 			}
 			if(str_class){
 				$('.' + str_class).each(function(index){
 					$(this).attr('class', str_class + ' selected');
+					$(this).css('background-color', 'rgba(255,0,255,0.55)');
+					
 				});
 			}
 			return str_class;

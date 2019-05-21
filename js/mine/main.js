@@ -406,8 +406,8 @@ var initEnv = function () {
       }      
 
       $("#context_menu li:nth-child(1)").removeClass("disabled");
-      if(main.drawObj.highlighted_cur){        
-        $("#context_menu li:nth-child(3)").addClass("enabled");
+      if(main.drawObj.highlighted_cur){
+        $("#context_menu li:nth-child(4)").addClass("enabled");
       }
       if (main.drawObj.canvas.getActiveObject()) {
         switch (main.drawObj.canvas.getActiveObject().type) {
@@ -720,13 +720,14 @@ var initEnv = function () {
       // currentDOM.setAttribute('class', curClass);
       main.highlightText(currentDOM);
       console.log(currentDOM, 'currentDOM')
-      currentDOM = currentDOM.nextElementSibling;      
+      currentDOM = currentDOM.nextElementSibling;
     }
     //Process End Element    
     main.highlightText(endDOM, "END", range.endOffset);
     $('.highlight').each(function(index){
       $(this).attr('class', curClass + " highlighted");
-      $(this).css('background-color', main.drawObj.convertHex(main.drawObj.drawColor, 50));
+      $(this).css('background-color', main.drawColor);
+      $(this).css({opacity: 0.55});
     });
     main.drawObj.highlighted_cur = curClass;
     main.drawObj.highlighted_arr.push(curClass);
