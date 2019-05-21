@@ -12,7 +12,8 @@ var classDraw = function (scale, canv_id, width, height) {
 	main.canvWidth = width;
 	main.canvHeight = height;
 	main.canvas = null;
-
+	main.highlighted_cur = null;
+  	main.highlighted_arr = [];
 	main.isDrawing = 0;
 	main.shape = null;
 	main.drawObj = null;
@@ -131,8 +132,37 @@ var classDraw = function (scale, canv_id, width, height) {
 			}
 			main.canvas.renderAll();
 			main.textarea_draging = false;
-		});		
-		
+		});
+		main.convertHex = function(hex, opacity){
+			hex = hex.replace('#','');
+			r = parseInt(hex.substring(0,2), 16);
+			g = parseInt(hex.substring(2,4), 16);
+			b = parseInt(hex.substring(4,6), 16);
+			result = 'rgba('+r+','+g+','+b+','+opacity/100+')';
+			return result;
+		}
+		main.getClassNameInCursor = function (arr, c_x, c_y){
+			var str_class = null;
+			console.log(arr, 'arrs')
+			for(var i = 0; i < arr.length; i++){
+				$('.' + arr[i]).each(function(index){
+					var pos = $(this).offset(),
+						w = $(this).width(), h = $(this).height();
+					if(c_x >= pos.left && c_x < (pos.left + w) &&
+						c_y >= pos.top && c_y < (pos.top + h)){
+							str_class = arr[i];							
+						}
+					$(this).attr('class', arr[i] + ' highlighted');
+					$(this).css('background-color', main.convertHex(main.drawColor, 0.5));
+				});
+			}
+			if(str_class){
+				$('.' + str_class).each(function(index){
+					$(this).attr('class', str_class + ' selected');
+				});
+			}
+			return str_class;
+		}
 		main.canvas.on("mouse:down", function (evt) {
 			
 			$("#menu_area").find("ul").removeClass("show");
@@ -141,10 +171,13 @@ var classDraw = function (scale, canv_id, width, height) {
 
 			var left = evt.e.offsetX / main.parent.scale;
 			var top = evt.e.offsetY / main.parent.scale;
-			
+			var a_left = evt.e.pageX, a_top = evt.e.pageY;
 			main.canvas.freeDrawingBrush.color = main.drawColor;
-			evt.e.stopPropagation();
+			evt.e.stopPropagation();			
 			
+			if(main.shape == 'select' && !evt.target){//downward to page-viewer
+				main.highlighted_cur = main.getClassNameInCursor(main.highlighted_arr, a_left, a_top);				
+			}
 			if (evt.target){
 			// if (!main.shape && evt.target){
 				main.onObjectSelected();

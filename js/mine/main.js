@@ -16,8 +16,7 @@ var initEnv = function () {
   main.pdfObj = null;
   main.is_draw = 0;
   main.selTool = 0;  
-  main.highlighted_cur = null;
-  main.highlighted_arr = [];
+  
   main.scale = 1;
   main.drawColor = "#ff0000"; // only for init / match with draw.js
   main.backColor = "#00ff00"; // only for init / match with draw.js
@@ -407,8 +406,8 @@ var initEnv = function () {
       }      
 
       $("#context_menu li:nth-child(1)").removeClass("disabled");
-      if(main.highlighted_cur){        
-        $("#context_menu li:nth-child(4)").addClass("enabled");
+      if(main.drawObj.highlighted_cur){        
+        $("#context_menu li:nth-child(3)").addClass("enabled");
       }
       if (main.drawObj.canvas.getActiveObject()) {
         switch (main.drawObj.canvas.getActiveObject().type) {
@@ -539,14 +538,14 @@ var initEnv = function () {
           main.drawObj.paste(xPos / zoom, yPos / zoom);
           break;
         case 3:
-          if(main.highlighted_cur){           
-            $('.' + main.highlighted_cur).each(function(index){
+          if(main.drawObj.highlighted_cur){           
+            $('.' + main.drawObj.highlighted_cur).each(function(index){
               var parent_text = $(this).parent().text();
               $(this).parent().text(parent_text);
               $(this).remove();
             });
-            main.highlighted_arr = main.highlighted_arr.filter(e => e != main.highlighted_cur);
-            main.highlighted_cur = false;
+            main.drawObj.highlighted_arr = main.drawObj.highlighted_arr.filter(e => e != main.drawObj.highlighted_cur);
+            main.drawObj.highlighted_cur = false;
           }else{
             main.drawObj.delete();
           }
@@ -564,23 +563,21 @@ var initEnv = function () {
       console.log(evt.target, 'mouse clicked on page class')
     });
     $("#viewer").on("mouseup", ".page-container", function (evt) {      
-      if(main.drawObj.shape == "select"){
-        var sel_class = evt.target.className.split(' ')[0];
-        if(sel_class.includes('hl_')){
-          for(var i = 0; i < main.highlighted_arr.length; i++){
-            $('.' + main.highlighted_arr[i]).each(function(index){
-              $(this).attr('class', main.highlighted_arr[i] + ' highlighted');
-            });  
-          }          
-          main.highlighted_cur = sel_class;          
-          $('.' + sel_class).each(function(index){
-            $(this).attr('class', sel_class + ' selected');
-          });
-        }
-      }else if(main.drawObj.shape == "highlight"){        
+      // if(main.drawObj.shape == "select"){
+      //   var sel_class = evt.target.className.split(' ')[0];
+      //   if(sel_class.includes('hl_')){
+      //     for(var i = 0; i < main.drawObj.highlighted_arr.length; i++){
+      //       $('.' + main.drawObj.highlighted_arr[i]).each(function(index){
+      //         $(this).attr('class', main.drawObj.highlighted_arr[i] + ' highlighted');
+      //       });  
+      //     }          
+          
+      //   }
+      // }else 
+      if(main.drawObj.shape == "highlight"){        
         main.highlight();
         main.clearSelection();
-        // evt.preventDefault();
+        evt.preventDefault();
       }
     });
     
@@ -637,7 +634,7 @@ var initEnv = function () {
       main.reposEdit();
     });
   };
-
+  
   main.reposEdit = function () {
     if (
       $("#popup_area").css("display") == "block" &&
@@ -726,13 +723,14 @@ var initEnv = function () {
       currentDOM = currentDOM.nextElementSibling;      
     }
     //Process End Element    
-    main.highlightText(endDOM, "END", range.endOffset);    
+    main.highlightText(endDOM, "END", range.endOffset);
     $('.highlight').each(function(index){
       $(this).attr('class', curClass + " highlighted");
+      $(this).css('background-color', main.drawObj.convertHex(main.drawObj.drawColor, 0.5));
     });
-    main.highlighted_cur = curClass;
-    main.highlighted_arr.push(curClass);
-    main.highlighted_arr = main.removeDuplicated(main.highlighted_arr);
+    main.drawObj.highlighted_cur = curClass;
+    main.drawObj.highlighted_arr.push(curClass);
+    main.drawObj.highlighted_arr = main.removeDuplicated(main.drawObj.highlighted_arr);
   };
 
   main.highlightText = function (elem, offsetType, idx) {      
