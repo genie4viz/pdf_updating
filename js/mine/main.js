@@ -161,15 +161,14 @@ var initEnv = function () {
       $("#background_area").css("display", "none");
       $("#font_area").css("display", "none");
       $("#font_style").css("display", "none");
-      $("#font_size").css("display", "none");      
-      // $("#viewer")
-      //   .children(".page:nth-child(" + main.pdfObj.page_num + ")")
-      //   .children(".page-container")
-      //   .css({
-      //     "z-index": "8"
-      //   });
+      $("#font_size").css("display", "none");
       $(this).addClass("active");
-
+      $("#viewer")
+        .children(".page:nth-child(" + main.pdfObj.page_num + ")")
+        .children(".page-container")
+        .css({
+          "z-index": "5"
+        });
       switch ($(this).index()) {
         case 0:
           main.drawObj.shape = "select";
@@ -228,8 +227,8 @@ var initEnv = function () {
             .children(".page:nth-child(" + main.pdfObj.page_num + ")")
             .children(".page-container")
             .css({
-              "z-index": "999"
-            });            
+              "z-index": "10"
+            });
           break;
         case 8:
           // $("#font_area").css("display", "block");
@@ -384,6 +383,7 @@ var initEnv = function () {
     });
     // show_popupmenu
     $(document).on("contextmenu", function (evt) {
+      
       var top = evt.pageY - $('.page-container').offset().top;
       var left = evt.pageX - $('.page-container').offset().left;
 
@@ -393,7 +393,7 @@ var initEnv = function () {
       $("#context_menu").fadeIn();
 
       $("#context_menu").removeClass("disabled");      
-      if (!main.drawObj.canvas.getActiveObject()) {        
+      if (!main.drawObj.canvas.getActiveObject()) {
         if(main.prevTool == null ){
           $("#context_menu").addClass("disabled");
         }
@@ -443,6 +443,9 @@ var initEnv = function () {
             case "text":
             case "rect":
             case "comment":
+              $("#font_area").css("display", "block");
+              $("#font_style").css("display", "block");
+              $("#font_size").css("display", "block");
               if(obj.type == "comment"){
                 main.prevTool = obj;                
               }else{
@@ -511,7 +514,7 @@ var initEnv = function () {
         case 1:          
           if(main.prevTool != null){//comment text copy            
             var txt_start = $('#popup_text textarea')[0].selectionStart;
-            var txt_end = $('#popup_text textarea')[0].selectionEnd            
+            var txt_end = $('#popup_text textarea')[0].selectionEnd;
             var selectedText = $('#popup_text textarea')[0].value.substring(txt_start, txt_end);            
             // main.prevTool.prevText = main.prevTool._objects[1].text;
             main.prevTool._objects[1].clone_text = selectedText;
@@ -557,8 +560,10 @@ var initEnv = function () {
       $("#context_menu").css("display", "none");
     });
 
-    $("#viewer").on("mouseup", ".page-container", function (evt) {
-      
+    $('.page').mousedown(function(evt){
+      console.log(evt.target, 'mouse clicked on page class')
+    });
+    $("#viewer").on("mouseup", ".page-container", function (evt) {      
       if(main.drawObj.shape == "select"){
         var sel_class = evt.target.className.split(' ')[0];
         if(sel_class.includes('hl_')){
@@ -566,8 +571,7 @@ var initEnv = function () {
             $('.' + main.highlighted_arr[i]).each(function(index){
               $(this).attr('class', main.highlighted_arr[i] + ' highlighted');
             });  
-          }
-          console.log(sel_class, 'selected ss')
+          }          
           main.highlighted_cur = sel_class;          
           $('.' + sel_class).each(function(index){
             $(this).attr('class', sel_class + ' selected');
@@ -576,7 +580,7 @@ var initEnv = function () {
       }else if(main.drawObj.shape == "highlight"){        
         main.highlight();
         main.clearSelection();
-        evt.preventDefault();
+        // evt.preventDefault();
       }
     });
     
@@ -863,16 +867,18 @@ var initEnv = function () {
 
           main.drawObj.drawColor = "#" + hex;
           main.drawObj.canvas.freeDrawingBrush.color = main.drawObj.drawColor;
+          
           if (main.drawObj.drawObj) {
             _setForeColor(main.drawObj.drawObj);
           }
           if (main.drawObj.selectObj) {
             _setForeColor(main.drawObj.selectObj);
           }
+          
 
           main.drawObj.canvas.renderAll();
 
-          function _setForeColor(obj) {
+          function _setForeColor(obj) {            
             if (obj._objects) {
               obj._objects.forEach(element => {
                 __setForeColor(element);
@@ -888,6 +894,9 @@ var initEnv = function () {
                     obj.set("fill", main.drawObj.drawColor);
                     break;
                   case "path":
+                    obj.set("stroke", main.drawObj.drawColor);
+                    break;
+                  case "cloud":
                     obj.set("stroke", main.drawObj.drawColor);
                     break;
                 }

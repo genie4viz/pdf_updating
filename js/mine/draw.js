@@ -134,7 +134,7 @@ var classDraw = function (scale, canv_id, width, height) {
 		});		
 		
 		main.canvas.on("mouse:down", function (evt) {
-
+			
 			$("#menu_area").find("ul").removeClass("show");
 			$("#color_area").parent().ColorPickerHide();
 			$("#color_background").parent().ColorPickerHide();
@@ -144,8 +144,9 @@ var classDraw = function (scale, canv_id, width, height) {
 			
 			main.canvas.freeDrawingBrush.color = main.drawColor;
 			evt.e.stopPropagation();
-
-			if (!main.shape && evt.target){				
+			
+			if (evt.target){
+			// if (!main.shape && evt.target){
 				main.onObjectSelected();
 			}
 
@@ -165,7 +166,7 @@ var classDraw = function (scale, canv_id, width, height) {
 
 			switch (main.shape) {
 				case "rect":
-					console.log('rectd')
+					var cloud_id = (main.getCloudCounts() + 1);
 					bg = new fabric.Rect(
 						{
 							type: "bg_stroke",
@@ -178,7 +179,7 @@ var classDraw = function (scale, canv_id, width, height) {
 							hasBorders: true,
 						});					
 					text = new fabric.Textbox("",
-						{
+						{							
 							type: "text",
 							fontFamily: main.fontFamily,
 							fontSize: main.fontSize,
@@ -189,13 +190,14 @@ var classDraw = function (scale, canv_id, width, height) {
 						});					
 					main.drawObj = new fabric.Group([bg, text],
 						{
+							id: "cloud_group_" + cloud_id,
 							type: main.shape,
 							left: left,
 							top: top,
 							lockScalingY: true,
 							selectable: false,
 						});	
-					var cloud_id = 'cloud_' +  (main.getCloudCounts() + 1);
+					
 					main.cloudObj = new fabric.Path(`
 							M0 30 C0 0,30 0,30 30 C30 0,60 0,60 30 C60 0,90 0,90 30 C90 0,120 0,120 30 C120 0,150 0,150 30
 							C180 30,180 60,150 60 C180 60,180 90,150 90 C180 90,180 120,150 120
@@ -203,7 +205,7 @@ var classDraw = function (scale, canv_id, width, height) {
 							C-30 120,-30 90,0 90 C-30 90,-30 60,0 60 C-30 60,-30 30,0 30
 						`,
 						{
-							id: cloud_id,
+							id: "cloud_" + cloud_id,
 							type: 'cloud',
 							left: left - main.cloud_sz,
 							top: top - main.cloud_sz,
@@ -211,13 +213,13 @@ var classDraw = function (scale, canv_id, width, height) {
 							scaleY: 1,
 							lockMovementX: true,
 							lockMovementY: true,
-							selectable: false,							
+							selectable: true,
 							fill: "transparent",
 							strokeWidth: 1,
-							stroke: main.backColor,
+							stroke: main.backColor,							
 					});
 					//save cloud id to drawObj
-					main.drawObj.cloud_id = cloud_id;
+					main.drawObj.cloud_id = "cloud_" + cloud_id;
 
 					main.cloudObj.setControlsVisibility({bl: false, br: false, mb: false, ml: false, mr: false, mt: false, tl: false, tr: false, mtr: false});
 					main.canvas.add(main.drawObj);
@@ -605,8 +607,7 @@ var classDraw = function (scale, canv_id, width, height) {
 		});
 		main.canvas.on({'object:moving': function (e) {
 			var group = e.target;
-			if(group.type == 'rect'){
-				console.log(group.cloud_id, 'cloudid')
+			if(group.type == 'rect'){				
 				var cloud = main.getObjectById(group.cloud_id);
 				cloud.set({
 					left: group.left - main.cloud_sz * cloud.scaleX,
@@ -1043,7 +1044,13 @@ var classDraw = function (scale, canv_id, width, height) {
 		var active = main.canvas.getActiveObject();
 		if(active.type == "rect"){
 			var cloud = main.getObjectById(active.cloud_id);
-			main.canvas.remove(cloud);	
+			main.canvas.remove(cloud);
+		}else if(active.type == "cloud"){
+			var cloud_group_id = 'cloud_group_' + active.id.split('_')[1];
+			console.log(cloud_group_id, ' group id will be ')
+			var cloud_group = main.getObjectById(cloud_group_id);
+			console.log(cloud_group, ' group will be ')
+			main.canvas.remove(cloud_group);	
 		}
 		if (!active)
 			return;
