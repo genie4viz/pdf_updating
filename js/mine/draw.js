@@ -139,6 +139,7 @@ var classDraw = function (scale, canv_id, width, height) {
 			g = parseInt(hex.substring(2,4), 16);
 			b = parseInt(hex.substring(4,6), 16);
 			result = 'rgba('+r+','+g+','+b+','+opacity/100+')';
+			console.log(result, 'colored')
 			return result;
 		}
 		main.getClassNameInCursor = function (arr, c_x, c_y){
@@ -153,7 +154,7 @@ var classDraw = function (scale, canv_id, width, height) {
 							str_class = arr[i];							
 						}
 					$(this).attr('class', arr[i] + ' highlighted');
-					$(this).css('background-color', main.convertHex(main.drawColor, 0.5));
+					$(this).css('background-color', main.convertHex(main.drawColor, 50));
 				});
 			}
 			if(str_class){

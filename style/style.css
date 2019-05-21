@@ -468,7 +468,7 @@ body
 }
 .selected
 {
-	background: rgba(255, 0, 0, 0.55);
+	background: rgba(255, 0, 255, 0.55);
 }
 
 #popup_scale

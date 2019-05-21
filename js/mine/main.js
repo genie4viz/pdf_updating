@@ -726,7 +726,7 @@ var initEnv = function () {
     main.highlightText(endDOM, "END", range.endOffset);
     $('.highlight').each(function(index){
       $(this).attr('class', curClass + " highlighted");
-      $(this).css('background-color', main.drawObj.convertHex(main.drawObj.drawColor, 0.5));
+      $(this).css('background-color', main.drawObj.convertHex(main.drawObj.drawColor, 50));
     });
     main.drawObj.highlighted_cur = curClass;
     main.drawObj.highlighted_arr.push(curClass);
