@@ -369,15 +369,18 @@ var classDraw = function (scale, canv_id, width, height) {
 							top: 0,
 							stroke: main.drawColor,
 							fill: false,
+							lockScalingX: true,
+							lockScalingY: true,
 							strokeWidth: 1
 						});
 
-					ruler_text = new fabric.Text("Length : 0m",
+					ruler_text = new fabric.Text("0'",
 						{
 							type: 'text',
 							left: 0,
 							top: -10,
 							fill: main.drawColor,
+							originX: 'center',
 							fontSize: 13,
 							fontFamily: "arial"
 						});
@@ -529,18 +532,23 @@ var classDraw = function (scale, canv_id, width, height) {
 					
 					if (main.rulerScale) {
 						main.drawObj._objects[1].set({
-							text: "Length : " + main.rulerLabel(line_dist, main.rulerScale),
+							text: main.rulerLabel(line_dist, main.rulerScale),
 							ruler_values: main.rulerValues(line_dist, main.rulerScale)
 						});
 					} else {						
 						main.drawObj._objects[1].set({ 
-							text: "Length : " + main.rulerLabel(Math.round(line_dist * 100) / 100, 1),
+							text: main.rulerLabel(Math.round(line_dist * 100) / 100, 1),
 							ruler_values: main.rulerValues(Math.round(line_dist * 100) / 100, 1)
 						});
 					}
 					text_width = main.drawObj._objects[1].width;
 					text_left = 0 - text_width / 2;
-
+					
+					if(line_angle > 90 || line_angle < -90){						
+						main.drawObj._objects[1].set({flipY: true, flipX: true, top: 10});
+					}else{						
+						main.drawObj._objects[1].set({flipY: false, flipX: false, top: -10});
+					}
 					main.line_dist = line_dist;
 					main.drawObj.set({ angle: line_angle, width: line_dist, noMove: 0 });
 					break;
@@ -671,13 +679,13 @@ var classDraw = function (scale, canv_id, width, height) {
 		var fract = main.reduce(in_dec, 100);
 		var str_inch = '';
 		if (in_int != 0){
-			str_inch = in_int + " inches ";
+			str_inch = in_int + '" ';
 		}
 		var str_fract = '';
 		if(fract[0] != '0'){
-			str_fract = fract[0] + "/" + fract[1] + " fraction";
+			str_fract = fract[0] + "/" + fract[1];
 		}
-		return feet + " ft " + str_inch + str_fract;
+		return feet + "' " + str_inch + str_fract;
 	}
 	main.rulerValues = function (pixel, rulerScale) {
 		var inches = Math.round(pixel * rulerScale * 100) / 100;
@@ -772,7 +780,7 @@ var classDraw = function (scale, canv_id, width, height) {
 					$("#font_area").css("display", "block");
 					$("#font_style").css("display", "block");
 					$("#font_size").css("display", "block");
-					$("#background_area").css("display", "block");
+					// $("#background_area").css("display", "block");
 					break;
 				case "text":
 					$("#font_area").css("display", "block");

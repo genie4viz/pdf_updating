@@ -153,9 +153,9 @@ var initEnv = function () {
       } else {
         return;
       }
-
-      $("#menu_area").find("ul").removeClass("show");
-
+      $("#color_area").parent().ColorPickerHide();
+			$("#color_background").parent().ColorPickerHide();
+      $("#menu_area").find("ul").removeClass("show");      
       $("#menu_area .active").removeClass("active");
       $("#background_area").css("display", "none");
       $("#font_area").css("display", "none");
@@ -186,7 +186,7 @@ var initEnv = function () {
           main.drawObj.canvas.isDrawingMode = false;
           main.drawObj.shape = "rect";
           main.drawObj.setSelectable(false);
-          $("#background_area").css("display", "block");
+          
           $("#font_area").css("display", "block");
           $("#font_style").css("display", "block");
           $("#font_size").css("display", "block");
@@ -248,10 +248,9 @@ var initEnv = function () {
           main.drawObj.shape = "picture";
           main.drawObj.setSelectable(false);
           break;
-        case 10:
-          // $("#font_area").css("display", "block");
-          // $("#font_style").css("display", "block");
-          // $("#font_size").css("display", "block");
+        case 10:          
+          if($("#arrow_list").hasClass("show"))
+            $("#arrow_list").removeClass("show");
           break;
         case 11:
           // $("#background_area").css("display", "block");
@@ -260,17 +259,24 @@ var initEnv = function () {
     });
     
 
-    $(".expand").on("click", function () {      
+    $(".expand").on("click", function () {
+      console.log($('#arrow_list').is(":visible"))
       if ($(this).children("ul").hasClass("show")) {
         $(this).children("ul").removeClass("show");        
-      } else {
-        $("#menu_area").find("ul").removeClass("show");
+      } else {        
         $(this)
           .children("ul")
           .addClass("show");
         $("#slider_stroke_width").val(main.drawObj.lineWidth);
         $("#span_line_width").text(main.drawObj.lineWidth);  
-      }      
+      }
+      // if($("#menu_area").find("ul").hasClass("show")){
+      //   $("#menu_area").find("ul").removeClass("show");
+      // }else{
+      //   $("#menu_area").find("ul").addClass("show");
+      //   $("#slider_stroke_width").val(main.drawObj.lineWidth);
+      //   $("#span_line_width").text(main.drawObj.lineWidth);  
+      // }      
     });
     //stroke width slider control
     $("#slider_stroke_width").on('input', function(e){
@@ -599,8 +605,7 @@ var initEnv = function () {
         main.drawObj.rulerScale = total_in / main.drawObj.line_dist;
         main.drawObj.unit = "in";
         main.drawObj.drawObj._objects[1].set({
-          text: "Length : " +
-            main.drawObj.rulerLabel(
+          text: main.drawObj.rulerLabel(
               main.drawObj.line_dist,
               main.drawObj.rulerScale
             ),
